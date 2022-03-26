@@ -1,8 +1,8 @@
 """Trivia Game - next.py course forum's challenge.
 
-Make sure questions.json file is in same directory as this file.
-Please install colorama package. Can be done by:
-    pip install colorama
+Make sure questions.json file and 'sounds' sub-folder are in same folder as this file.
+Please install needed external packages (colorama & playsound). Do it with this command:
+    pip install -r requirements.txt
 
 Usage:
     python nextpy_trivia.py
@@ -11,6 +11,7 @@ import json
 import random
 import os
 import colorama
+import playsound
 
 QUESTIONS_FILE = 'questions.json'
 ATTEMPTS = 5
@@ -49,7 +50,7 @@ def read_questions_file(q_file: str) -> list:
 
 
 def greet(num_of_questions: int):
-    """Print game's opening message.
+    """Game's opening message.
 
     :param num_of_questions: the numbers of questions in this game
     :return: None
@@ -57,11 +58,13 @@ def greet(num_of_questions: int):
     clear_screen()
     print(style_text('Wellcome to my next.py trivia game!', 'yellow', bold=True))
     instructions = f"""
-You will be asked {num_of_questions} questions. You got up to {ATTEMPTS} attempts to give the right answer.
-For each question you can get one clue (which is considered as an attempt).
-Goal is to give the right answer with the least number of attempts.
+You will be asked {num_of_questions} questions.
+For each question you get up to {ATTEMPTS} attempts to give the right answer.
+One clue can be given for each question (which is considered as an attempt).
+Goal is to give the right answer, for all questions, with the fewest attempts.
 """
     print(instructions)
+    safe_sound('opening.mp3')
 
 
 def clear_screen():
@@ -113,18 +116,26 @@ def run_single_question(q_data: dict, q_num: int) -> int:
         attempt += 1
         if answer in ('help', 'clue', 'hint'):
             if clue_used:
-                print("You've already asked for the clue before...")
+                print(style_text("You've already asked for the clue before...", 'yellow'))
             print(f"Hint: {q_data['hint']}")
+            safe_sound('beep.mp3')
             clue_used = True
             continue
         if right_answer(answer, q_data['answer']):
             print(style_text("You are right! ", 'green', bold=True) +
                   f"({attempt} attempt{'s' if attempt > 1 else ''})")
+            safe_sound('short-success.mp3', True)
             return attempt
         else:
-            print(f"{STYLE['red']}Wrong answer{STYLE['clear']}{' try again' if attempt < ATTEMPTS else ''}")
+            print(style_text('Wrong answer', 'red'), end=' ')
+            if attempt < ATTEMPTS:
+                print(f"(attempt {attempt} out of {ATTEMPTS})")
+                safe_sound('fail.mp3')
+            else:
+                print()
 
     print(style_text(f"You failed to give the right answer in {ATTEMPTS} attempts", 'red', bold=True))
+    safe_sound('power-down.mp3', True)
     return 0
 
 
@@ -144,6 +155,28 @@ def end_game(results: list):
     print(style_text('\n -= Game Over =- ', 'yellow', bold=True))
     print(f"You answered {len(results) - unanswered_questions} out of {len(results)} questions.")
     print(style_text(f"Your score is: {score:.1f} (max is 10)", score_color, bold=True))
+    if score_color == 'red':
+        safe_sound('notification.mp3', True)
+    else:
+        safe_sound('happy-end.mp3', True)
+
+
+def safe_sound(file: str, blocking: bool = False):
+    """Try to play the sound in the given file.
+
+    All sound files are expected to be under 'sounds' folder. It is a sub-folder within same folder as this file.
+    If playsound raise an exception, we ignore it so program will continue.
+
+    :param file: the full name of the file (without path)
+    :param blocking: should program pause till the end of sound playing (default: False)
+    :return: None
+    """
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    sound_file_path = os.path.join(base_path, 'sounds/', file)
+    try:
+        playsound.playsound(sound_file_path, blocking)
+    except playsound.PlaysoundException:
+        pass
 
 
 def style_text(text: str, color: str, bold: bool = False) -> str:
