@@ -16,8 +16,9 @@
 
 #### Pre-requests
 
-1. Make sure _**questions.json**_ file is in same directory as _**nextpy_trivia.py**_ file.
-2. Install colorama package. Can be done with this command: `pip install colorama`
+1. Make sure **_questions.json_** file and **_'sounds'_** sub-folder are in same folder as _**nextpy_trivia.py**_ file.
+2. Install needed external packages (colorama & playsound). 
+Please do it with this command: `python -m pip install -r requirements.txt`
 
 #### Running the game
 
@@ -70,6 +71,10 @@ You win!
 It took you 2 attempts.
 ```
 
+## Credits
+
+Music by [EdR](https://pixabay.com/users/edr-1177074/?tab=audio&utm_source=link-attribution&utm_medium=referral&utm_campaign=audio&utm_content=8333) 
+from [Pixabay](https://pixabay.com/music/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=8333)
 
 ### How to Convert a Python project to exe file 
 https://www.youtube.com/watch?v=bqNvkAfTvIc
